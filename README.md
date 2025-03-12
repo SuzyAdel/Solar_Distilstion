@@ -11,13 +11,22 @@ The **Pyramid Solar Distillation (PSD)** system leverages solar energy to evapor
 ### 2. **Impact of Salt Concentration**
    - **Salt concentration** in the feedwater influences evaporation efficiency. High salt concentrations tend to slow down evaporation due to increased solution viscosity and surface tension.
    - The system can still achieve high evaporation rates even with high salt concentrations, aided by **3D conical evaporation structures** that help in salt harvesting.
-  
+     
+   ![saltcon](https://github.com/user-attachments/assets/d4f47c2a-6cd0-4c83-81f4-1397f6a28f99)
+
 ### 3. **Evaporation Rates**
    - **Evaporation rate** depends on the design and operational parameters. **Water depth** is a key factor in the model, where shallower water depths generally result in faster evaporation.
    - The use of **wick materials** like jute and cotton can also improve evaporation rates, enhancing productivity.
-  
+     
+  ![Evaporation rate ](https://github.com/user-attachments/assets/fe6f7213-a9e6-446c-9179-6d76b746cd26)
+
 ### 4. **Brine Discharge for Salt Control**
    - The model includes a **brine discharge** mechanism to maintain an optimal salt concentration in the basin, ensuring that evaporation rates are not hindered by high salt levels.
+     
+![solar rad](https://github.com/user-attachments/assets/40f81a88-473a-4a87-8781-83a72fa63764)
+
+
+![final out](https://github.com/user-attachments/assets/2a6479c1-21fc-40d0-bf87-6c18365e3704)
 
 ### 5. **Freshwater Collection**
    - The system collects **pure freshwater** as evaporated water condenses, ensuring a clean and sustainable water source.
@@ -47,3 +56,5 @@ Several key modifications can improve the efficiency and productivity of the PSD
 To run the Pyramid Solar Distillation model, you need a Python environment with the following libraries:
 - `numpy`
 - `matplotlib` (for visualizations, if applicable)
+
+  
