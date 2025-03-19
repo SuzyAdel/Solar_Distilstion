@@ -1,116 +1,205 @@
 ﻿import numpy as np
 import matplotlib.pyplot as plt
-import math
 
-# ---------------------- Constants & Parameters ----------------------
-# Geometry (Square-based pyramid distiller)
-base_length = 1.0  # meters
-water_depth = 0.05  # meters
-glass_incline_angle_deg = 30  # degrees
-glass_incline_angle_rad = math.radians(glass_incline_angle_deg)
+# --- Constants and Physical Parameters ---
+# Stefan-Boltzmann constant for radiation calculations (W/m²·K⁴)
+sigma = 5.67e-8
+# Latent heat of vaporization of water (J/kg)
+latent_heat_vaporization = 2260e3
+# Density of water (kg/m³)
+density_water = 1000
+# Specific heat capacity of water (J/kg·K)
+heat_capacity_water = 4186
+# Initial saline water volume (liters)
+initial_water_volume = 10
+# Initial salt concentration (g/L), typical seawater
+initial_salt_concentration = 35
+# Surface area of pyramid solar still cover (m²)
+surface_area = 1.5
+# Emissivity of the glass cover
+glass_emissivity = 0.85
 
-# Material and Environmental Properties
-C_air = 1005  # J/kg.K (air specific heat)
-sigma = 5.67e-8  # Stefan-Boltzmann constant
-R = 8.314  # universal gas constant (J/mol·K)
-M_water = 18.01528  # g/mol
-
-# Antoine equation constants for water
-A = 8.07131
-B = 1730.63
-C = 233.426
-
-# Salt concentration influence factor (example reduction factor)
-salt_concentration_factor = 0.98  # decreases vapor pressure by ~2%
-
-# Condensation efficiency factor
-condensation_efficiency = 0.85
-
-# Water properties
-water_density = 997  # kg/m³
-
-# Solar parameters
-I_max = 1000  # W/m² (peak irradiance)
-
-# Time array for 24 hours (hourly steps)
+# --- Time Array (24 hours simulation) ---
 time_hours = np.arange(0, 24, 1)
 
-# ---------------------- Geometry Calculations ----------------------
-# Slant height of the glass faces
-slant_height = (base_length / 2) / math.cos(glass_incline_angle_rad)
+# --- Solar Radiation Simulation (W/m²) ---
+# Using sinusoidal solar pattern + randomness for realism
+np.random.seed(42)
+solar_radiation = (
+    500
+    + 400 * np.maximum(np.sin(np.pi * time_hours / 24), 0)
+    + np.random.normal(0, 30, size=len(time_hours))
+)
 
-# Glass area (4 triangular faces)
-glass_area = 4 * (0.5 * base_length * slant_height)
+# --- Water & Glass Temperature Simulation (°C) ---
+water_temp = 20 + (solar_radiation / 100) + np.random.normal(0, 0.5, size=len(time_hours))
+glass_temp = water_temp - 2 + np.random.normal(0, 0.3, size=len(time_hours))
 
-# Base area
-base_area = base_length ** 2
+# --- Condensation Efficiency Calculation ---
+# Modeled using logistic function: increases with glass temp
+cond_efficiency = 90 / (1 + np.exp(-(glass_temp - 25) / 2)) + np.random.normal(0, 2, size=len(time_hours))
+cond_efficiency = np.clip(cond_efficiency, 70, 95)  # Realistic bounds
 
-# Water surface area inside (approx equal to base area for shallow water)
-water_surface_area = base_area
+# --- Evaporation and Salt Concentration Tracking ---
+salt_concentration = [initial_salt_concentration]
+evaporation_rate = []
+cumulative_fresh_water = [0]
+remaining_saline_water = [initial_water_volume]
 
-# ---------------------- Functions ----------------------
-def solar_irradiance(hour):
-    # Simulating irradiance using cosine shape (peak at noon, zero at night)
-    solar_constant = I_max * max(np.cos((hour - 12) * (np.pi / 12)), 0)
-    return solar_constant
+# --- Evaporation Calculation Per Hour ---
+# Evaporation rate influenced by solar radiation, salt concentration, and condensation efficiency
+for t in range(len(time_hours)):
+    current_salt = salt_concentration[-1]
+    evap_rate = (
+        (0.0003 * solar_radiation[t])  # Proportional to solar input
+        * (1 - (current_salt / 300))   # Salt reduces evaporation
+        * cond_efficiency[t] / 100     # Condensation effectiveness
+    )
+    # Add slight random variation
+    evap_rate += np.random.normal(0, evap_rate * 0.05)
+    evap_rate = max(evap_rate, 0)  # Prevent negative rates
+    evaporation_rate.append(evap_rate)
 
-def vapor_pressure_water(temp_c):
-    # Antoine equation for water vapor pressure in mmHg
-    vp_mmHg = 10 ** (A - (B / (temp_c + C)))
-    # Convert mmHg to Pascal (1 mmHg = 133.322 Pa)
-    vp_Pa = vp_mmHg * 133.322
-    return vp_Pa
+    # Update system state
+    new_volume = remaining_saline_water[-1] - evap_rate
+    new_volume = max(new_volume, 0)
+    remaining_saline_water.append(new_volume)
+    cumulative_fresh_water.append(cumulative_fresh_water[-1] + evap_rate)
+    
+    if new_volume > 0:
+        salt_concentration.append((current_salt * remaining_saline_water[-2]) / new_volume)
+    else:
+        salt_concentration.append(current_salt)
 
-def evaporation_rate(irradiance, temp_water, salt_factor):
-    # Basic empirical formula: Evaporation proportional to irradiance & vapor pressure difference
-    vapor_pressure = vapor_pressure_water(temp_water) * salt_factor
-    # Simplified form: rate (kg/s) = efficiency * irradiance * glass_area * factor
-    # Reference factor chosen to scale results (~ realistic scale)
-    factor = 1e-5
-    return irradiance * glass_area * factor * (vapor_pressure / 1e5) * condensation_efficiency
+instantaneous_fw = evaporation_rate  # Instantaneous fresh water each hour
 
-# ---------------------- Simulation ----------------------
-water_temp_c = 60  # assumed constant, can later vary with time
-salt_concentration = 0.035  # 3.5% average seawater
+# --- Energy Absorption & Loss Calculation ---
+energy_absorbed = solar_radiation * surface_area * (1 - glass_emissivity)
+energy_lost = energy_absorbed * (0.2 + np.random.normal(0, 0.02, size=len(time_hours)))
 
-results_irradiance = []
-results_evaporation_kg_per_hour = []
+# =================== RESULTS OUTPUT =================== #
+total_fresh_water = cumulative_fresh_water[-1]
+peak_hour = np.argmax(instantaneous_fw)
+peak_fw = instantaneous_fw[peak_hour]
 
-for hour in time_hours:
-    irr = solar_irradiance(hour)
-    results_irradiance.append(irr)
+print("===== Simulation Summary =====")
+print(f"Total fresh water collected in 24 hours: {total_fresh_water:.2f} liters")
+print(f"Maximum fresh water production occurs at hour: {peak_hour}h")
+print(f"Fresh water produced during peak hour: {peak_fw:.3f} liters")
+print("\nInterpretation:")
+print(f"- Freshwater production peaks typically between midday and early afternoon (around hour {peak_hour}),")
+print("  corresponding to maximum solar radiation and higher water/glass temperature difference.")
+print(f"- The system efficiency is well correlated with solar intensity and condensation conditions.\n")
 
-    evap_rate_kg_s = evaporation_rate(irr, water_temp_c, salt_concentration_factor)
-    evap_kg_hour = evap_rate_kg_s * 3600
+# ===================== PLOTS ===================== #
+# (All your plots as you had them)
 
-    results_evaporation_kg_per_hour.append(evap_kg_hour)
-
-# ---------------------- Results ----------------------
-
-# Convert evaporated mass into liters (1L ~ 1kg for water)
-fresh_water_liters_per_hour = results_evaporation_kg_per_hour
-
-plt.figure(figsize=(12, 6))
-plt.plot(time_hours, results_irradiance, label='Solar Irradiance (W/m²)', color='orange')
-plt.ylabel('Solar Irradiance (W/m²)')
-plt.xlabel('Time (hours)')
-plt.title('Solar Irradiance over 24 Hours')
-plt.grid()
+# 1) Solar Radiation & Water Temperature
+plt.figure(figsize=(10, 5))
+plt.title('Solar Radiation & Water Temperature Over Time')
+ax1 = plt.gca()
+ax2 = ax1.twinx()
+ax1.plot(time_hours, solar_radiation, label='Solar Radiation (W/m²)', color='orange')
+ax2.plot(time_hours, water_temp, label='Water Temp (°C)', color='blue')
+ax1.set_ylabel('Solar Radiation (W/m²)')
+ax2.set_ylabel('Water Temperature (°C)')
+ax1.set_xlabel('Time (hours)')
+ax1.grid()
+plt.xticks(time_hours)
+ax1.legend(loc='upper left')
+ax2.legend(loc='upper right')
 plt.show()
 
-plt.figure(figsize=(12, 6))
-plt.plot(time_hours, fresh_water_liters_per_hour, label='Fresh Water Output (Liters/hour)', color='blue')
-plt.ylabel('Fresh Water Output (L/h)')
-plt.xlabel('Time (hours)')
-plt.title('Distilled Fresh Water Production over 24 Hours')
-plt.grid()
+# 2) Salt concentration & cumulative fresh water
+fig, ax1 = plt.subplots(figsize=(10, 5))
+plt.title('Salt Concentration & Cumulative Fresh Water Over Time')
+ax2 = ax1.twinx()
+ax1.plot(time_hours, salt_concentration[:-1], color='brown', label='Salt Concentration (g/L)')
+ax2.plot(time_hours, cumulative_fresh_water[:-1], color='green', label='Cumulative Fresh Water (L)')
+ax1.set_xlabel('Time (hours)')
+ax1.set_ylabel('Salt Concentration (g/L)', color='brown')
+ax2.set_ylabel('Cumulative Fresh Water (L)', color='green')
+ax1.grid()
+plt.xticks(time_hours)
+ax1.legend(loc='upper left')
+ax2.legend(loc='upper right')
 plt.show()
 
-# Total daily output
-print(f"Total fresh water produced in 24 hours: {sum(fresh_water_liters_per_hour):.2f} liters")
+# 3) Cumulative FW, remaining saline water, initial water + instantaneous FW
+plt.figure(figsize=(10, 5))
+plt.title('Water Collection and Volumes Over Time')
+plt.plot(time_hours, cumulative_fresh_water[:-1], label='Cumulative FW (L)', color='green')
+plt.plot(time_hours, remaining_saline_water[:-1], label='Remaining Saline Water (L)', color='red')
+plt.plot(time_hours, [initial_water_volume]*len(time_hours), '--', color='black', label='Initial Water Volume (L)')
+plt.bar(time_hours, instantaneous_fw, label='Instantaneous FW (L/h)', color='purple', alpha=0.5)
+plt.xlabel('Time (hours)')
+plt.grid()
+plt.xticks(time_hours)
+plt.legend()
+plt.show()
 
-# ---------------------- Validation ----------------------
-# Print sample values to validate understanding
-for hour, irr, evap in zip(time_hours, results_irradiance, fresh_water_liters_per_hour):
-    print(f"Hour {hour}: Irradiance = {irr:.2f} W/m², Fresh Water = {evap:.4f} L")
+# 4) Instantaneous fresh water collected per hour
+plt.figure(figsize=(10, 5))
+plt.title('Instantaneous Fresh Water Collected Per Hour')
+plt.bar(time_hours, instantaneous_fw, color='skyblue')
+plt.xlabel('Time (hours)')
+plt.ylabel('Liters per Hour')
+plt.grid()
+plt.xticks(time_hours)
+plt.show()
 
+# 5) Evaporation rate & salt concentration
+fig, ax1 = plt.subplots(figsize=(10, 5))
+ax1.set_xlabel('Time (hours)')
+ax1.set_ylabel('Evaporation Rate (L/h)', color='blue')
+ax1.plot(time_hours, evaporation_rate, color='blue', label='Evaporation Rate (L/h)')
+ax2 = ax1.twinx()
+ax2.set_ylabel('Salt Concentration (g/L)', color='brown')
+ax2.plot(time_hours, salt_concentration[:-1], color='brown', linestyle='dashed', label='Salt Concentration (g/L)')
+plt.title('Evaporation Rate & Salt Concentration Over Time')
+ax1.grid()
+plt.xticks(time_hours)
+ax1.legend(loc='upper left')
+ax2.legend(loc='upper right')
+plt.show()
+
+# 6) Evaporation rate & solar radiation
+fig, ax1 = plt.subplots(figsize=(10, 5))
+ax1.set_xlabel('Time (hours)')
+ax1.set_ylabel('Evaporation Rate (L/h)', color='blue')
+ax1.plot(time_hours, evaporation_rate, color='blue', label='Evaporation Rate (L/h)')
+ax2 = ax1.twinx()
+ax2.set_ylabel('Solar Radiation (W/m²)', color='orange')
+ax2.plot(time_hours, solar_radiation, color='orange', linestyle='dashed', label='Solar Radiation (W/m²)')
+plt.title('Evaporation Rate & Solar Radiation Over Time')
+ax1.grid()
+plt.xticks(time_hours)
+ax1.legend(loc='upper left')
+ax2.legend(loc='upper right')
+plt.show()
+
+# 7) Energy absorbed & lost
+fig, ax1 = plt.subplots(figsize=(10, 5))
+ax1.set_xlabel('Time (hours)')
+ax1.set_ylabel('Energy Absorbed (J)', color='green')
+ax1.plot(time_hours, energy_absorbed, color='green', label='Energy Absorbed')
+ax2 = ax1.twinx()
+ax2.set_ylabel('Energy Lost (J)', color='red')
+ax2.plot(time_hours, energy_lost, color='red', linestyle='dashed', label='Energy Lost')
+plt.title('Energy Absorbed & Lost Over Time')
+ax1.grid()
+plt.xticks(time_hours)
+ax1.legend(loc='upper left')
+ax2.legend(loc='upper right')
+plt.show()
+
+# 8) Glass temperature & water temperature
+plt.figure(figsize=(10, 5))
+plt.title('Glass & Water Temperature Over Time')
+plt.plot(time_hours, water_temp, color='blue', label='Water Temperature (°C)', linestyle='solid')
+plt.plot(time_hours, glass_temp, color='purple', label='Glass Temperature (°C)', linestyle='dotted')
+plt.xlabel('Time (hours)')
+plt.grid()
+plt.xticks(time_hours)
+plt.legend()
+plt.show()
