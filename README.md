@@ -7,7 +7,7 @@ The **Pyramid Solar Distillation (PSD)** system leverages solar energy to evapor
 ### 1. **Solar Radiation as the Primary Energy Source**
    - The **solar intensity** is the main driving force behind the evaporation process. The model calculates solar radiation based on environmental factors, such as location, weather, and time of day.
    - **Design Modifications**: Modifications like increasing the **glass cover surface area** and using **reflectors and mirrors** can significantly boost solar radiation input, enhancing evaporation rates.
-  
+  ![solar rad](https://github.com/user-attachments/assets/40f81a88-473a-4a87-8781-83a72fa63764)
 ### 2. **Impact of Salt Concentration**
    - **Salt concentration** in the feedwater influences evaporation efficiency. High salt concentrations tend to slow down evaporation due to increased solution viscosity and surface tension.
    - The system can still achieve high evaporation rates even with high salt concentrations, aided by **3D conical evaporation structures** that help in salt harvesting.
@@ -23,13 +23,13 @@ The **Pyramid Solar Distillation (PSD)** system leverages solar energy to evapor
 ### 4. **Brine Discharge for Salt Control**
    - The model includes a **brine discharge** mechanism to maintain an optimal salt concentration in the basin, ensuring that evaporation rates are not hindered by high salt levels.
      
-![solar rad](https://github.com/user-attachments/assets/40f81a88-473a-4a87-8781-83a72fa63764)
-
-
 ![final out](https://github.com/user-attachments/assets/2a6479c1-21fc-40d0-bf87-6c18365e3704)
+
 
 ### 5. **Freshwater Collection**
    - The system collects **pure freshwater** as evaporated water condenses, ensuring a clean and sustainable water source.
+
+![final out](https://github.com/user-attachments/assets/2a6479c1-21fc-40d0-bf87-6c18365e3704)
 
 ## Mathematical Modeling and Key Equations
 ### 1. **Thermal Modeling**:
