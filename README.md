@@ -1,60 +1,110 @@
-# Pyramid Solar Distillation Model
+# 🌞 Pyramid Solar Distillation (PSD) System  
 
-## Overview
-The **Pyramid Solar Distillation (PSD)** system leverages solar energy to evaporate water, leaving salts and impurities behind. This system is particularly effective for water purification in arid regions and remote areas. The model simulates the distillation process by considering key factors such as **solar radiation**, **salt concentration**, and **evaporation rates**. This comprehensive approach allows us to analyze how design modifications can optimize the system’s performance, ensuring efficient freshwater production.
+![Solar Desalination](path/to/image1.png)  
 
-## Key Features
-### 1. **Solar Radiation as the Primary Energy Source**
-   - The **solar intensity** is the main driving force behind the evaporation process. The model calculates solar radiation based on environmental factors, such as location, weather, and time of day.
-   - **Design Modifications**: Modifications like increasing the **glass cover surface area** and using **reflectors and mirrors** can significantly boost solar radiation input, enhancing evaporation rates.
-  ![solar rad](https://github.com/user-attachments/assets/40f81a88-473a-4a87-8781-83a72fa63764)
-### 2. **Impact of Salt Concentration**
-   - **Salt concentration** in the feedwater influences evaporation efficiency. High salt concentrations tend to slow down evaporation due to increased solution viscosity and surface tension.
-   - The system can still achieve high evaporation rates even with high salt concentrations, aided by **3D conical evaporation structures** that help in salt harvesting.
-     
-   ![saltcon](https://github.com/user-attachments/assets/d4f47c2a-6cd0-4c83-81f4-1397f6a28f99)
+## 🔹 Overview  
+The **Pyramid Solar Distillation (PSD)** system harnesses solar energy to evaporate and condense water, effectively purifying saline or contaminated water. This system is particularly beneficial in arid and remote regions where fresh water is scarce.  
 
-### 3. **Evaporation Rates**
-   - **Evaporation rate** depends on the design and operational parameters. **Water depth** is a key factor in the model, where shallower water depths generally result in faster evaporation.
-   - The use of **wick materials** like jute and cotton can also improve evaporation rates, enhancing productivity.
-     
-  ![Evaporation rate ](https://github.com/user-attachments/assets/fe6f7213-a9e6-446c-9179-6d76b746cd26)
+This project simulates the desalination process using computational models that incorporate **solar radiation, salt concentration, evaporation rates, and thermodynamic principles** to optimize fresh water production.  
 
-### 4. **Brine Discharge for Salt Control**
-   - The model includes a **brine discharge** mechanism to maintain an optimal salt concentration in the basin, ensuring that evaporation rates are not hindered by high salt levels.
-     
-![final out](https://github.com/user-attachments/assets/2a6479c1-21fc-40d0-bf87-6c18365e3704)
+---
+
+## 🔬 Key Features  
+✅ **Simulates 24-hour solar desalination cycle**  
+✅ **Accounts for real-world variations in solar radiation**  
+✅ **Models evaporation, condensation, and salt concentration changes**  
+✅ **Energy balance calculations for efficiency analysis**  
+✅ **Comprehensive visualization with plots**  
+
+---
+
+## 📌 How It Works  
+
+The simulation models:  
+- **Solar Radiation** 🌞: Uses a sinusoidal model with randomness to mimic real-world fluctuations.  
+- **Water & Glass Temperature** 💦🔲: Empirically determined based on solar input and thermal interactions.  
+- **Evaporation Rate** 🌡️: Depends on solar intensity, salt concentration, and condensation efficiency.  
+- **Salt Concentration** 🧂: Increases over time as water evaporates.  
+- **Energy Absorbed & Lost** ⚡: Calculated using thermodynamic principles to determine system efficiency.  
+
+### 📊 Key Equations  
+#### 1️⃣ Solar Radiation Model  
+
+ ![image](https://github.com/user-attachments/assets/cba726c7-4df2-4e03-a763-79e7a13d11be)
+ where `ε(t) ~ N(0,30)` accounts for random fluctuations.  
+
+#### 2️⃣ Evaporation Rate Model  
+![image](https://github.com/user-attachments/assets/e0e857ab-21b5-4ead-874f-f437a7ca5f29)
 
 
-### 5. **Freshwater Collection**
-   - The system collects **pure freshwater** as evaporated water condenses, ensuring a clean and sustainable water source.
+where `G` is solar radiation, `Cs` is salt concentration, and `ηc` is condensation efficiency.  
 
-![final out](https://github.com/user-attachments/assets/2a6479c1-21fc-40d0-bf87-6c18365e3704)
+More equations and references can be found in the **docs folder**.  
 
-## Mathematical Modeling and Key Equations
-### 1. **Thermal Modeling**:
-   - Heat transfer in the system is modeled using **Fourier's law**, considering energy balances between the absorber, water, and glass cover. 
-   
-### 2. **Evaporation Rate**:
-   - The evaporation rate is based on **solar intensity** and **salt concentration**. The Clausius-Clapeyron equation can be used to estimate the rate at which water evaporates at different temperatures and salt concentrations.
+---
 
-### 3. **Optimization Using Response Surface Methodology (RSM)**:
-   - RSM helps predict the performance of the system by analyzing the effect of key parameters like **solar radiation**, **wind speed**, and **ambient temperature**.
-  
-### 4. **Numerical Simulation**:
-   - The model incorporates **numerical simulations** to understand the heat and mass transfer processes, using design optimizations like **PCM** (Phase Change Materials) and **absorber fins** for improved thermal performance.
+## 🚀 Installation & Usage  
 
-## Design Optimizations
-Several key modifications can improve the efficiency and productivity of the PSD system:
-   - **V-corrugated absorbers with PCM**: These can increase productivity by up to **87.4%** by improving heat storage and absorption capabilities.
-   - **Wick materials (e.g., jute and cotton)**: These materials increase evaporation surface area, enhancing freshwater production by **122%**.
-   - **Square absorber fins with PCM**: These fins improve thermal performance and can boost daily productivity by **49.19%**.
-   - **External mirrors and condenser**: These increase solar radiation input and improve yield by **159%**.
-   - **Nano and wick materials**: This combination improves heat transfer and evaporation rates, leading to a **176%** increase in productivity.
-
+### 📦 Requirements  
+- Python 3.x  
+- NumPy  
+- Matplotlib
 ## Installation
 To run the Pyramid Solar Distillation model, you need a Python environment with the following libraries:
 - `numpy`
 - `matplotlib` (for visualizations, if applicable)
 
+  ###📈 Example Output
   
+🔹 Solar Radiation & Water Temperature Over Time
+
+![image](https://github.com/user-attachments/assets/e8f2721f-400c-47b4-95f5-3f20edf60b79)
+
+🔹 Salt Concentration & Cumulative Fresh Water
+
+![image](https://github.com/user-attachments/assets/f5a9002e-93eb-432b-a731-5eb7ea33d96b)
+
+🔹 Energy Absorbed vs. Lost
+
+![image](https://github.com/user-attachments/assets/5c0724a8-fe3c-4578-9839-306cddcfe1a2)
+
+🔹 Evaporation Rate Over Time
+
+![image](https://github.com/user-attachments/assets/4bb977e2-1f16-41d6-aa7f-637122723a74)
+![image](https://github.com/user-attachments/assets/5bd5e5f9-18dd-489a-bad4-4d87cc61c277)
+
+🔹 Water Volume Change Over Time
+
+![image](https://github.com/user-attachments/assets/76505ffc-362f-47b7-84f2-9e857b08f5e1)
+![image](https://github.com/user-attachments/assets/ce7f3f9b-7a31-49d8-bb69-a0b77a9bac24)
+
+🔹 Glass & Water Temperature Relationship
+
+![image](https://github.com/user-attachments/assets/c1683268-0882-495a-8375-f7a42b312904)
+
+More results and analysis are provided in the generated plots.
+
+📖 References
+
+## 📖 References  
+- Kabeel, A.E. (2009). *Performance of solar still with a concave wick evaporation surface.* Renewable Energy, 34(3), 493-498.  
+- Dunkle, R. V. (1961). *Solar water distillation: The roof-type still and a multiple effect diffusion still.* International Developments in Heat Transfer, 895–902.  
+- Tiwari, G. N., & Sahota, L. (2017). *Advanced Solar Distillation Systems.* Springer.  
+- Malik, M. A. S., Tiwari, G. N., Kumar, A., & Sodha, M. S. (1982). *Solar Distillation.* Pergamon Press.  
+
+
+### ▶️ Running the Simulation  
+Clone the repository and run the script:  
+
+```bash
+git clone https://github.com/yourusername/solar_distillation.git
+cd solar_distillation
+python solar_distillation.py
+
+## 🚀 Installation & Usage
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/solar-distillation.git
+   cd solar-distillation
+
+
