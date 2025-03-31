@@ -1,6 +1,6 @@
 # 🌞 Pyramid Solar Distillation (PSD) System  
 
-![Solar Desalination](path/to/image1.png)  
+![Solar Desalination]([path/to/image1.png](https://github.com/SuzyAdel/Solar_Distilstion/blob/main/Pyramid_Solar_Distillation.sln))  
 
 ## 🔹 Overview  
 The **Pyramid Solar Distillation (PSD)** system harnesses solar energy to evaporate and condense water, effectively purifying saline or contaminated water. This system is particularly beneficial in arid and remote regions where fresh water is scarce.  
